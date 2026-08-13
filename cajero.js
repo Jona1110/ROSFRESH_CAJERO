@@ -19,6 +19,12 @@ function setupPosListeners() {
         });
     });
 
+    document.querySelector('.cart-title').addEventListener('click', () => {
+    if (window.innerWidth <= 992) {
+        document.querySelector('.pos-cart-section').classList.toggle('mobile-open');
+    }
+});
+
     // Buscador
     document.getElementById('searchPosInput').addEventListener('input', (e) => {
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
