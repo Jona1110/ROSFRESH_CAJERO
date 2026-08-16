@@ -100,7 +100,6 @@ function renderPosGrid(products) {
 function openCustomPosModal(id, name, price, isAgotado, category) {
     if (isAgotado) return;
 
-    // Si es salsa o topping directo, se añade sin preguntar
     if (category === 'Salsas' || category === 'Toppings') {
         addToPosCart(id, name, price, "", "");
         return;
@@ -229,7 +228,7 @@ async function processPosSale() {
         detailsSummary += `${item.qty}x ${item.name}${customInfo}, `;
     });
     
-    detailsSummary = detailsSummary.slice(0, -2); // Remover la última coma
+    detailsSummary = detailsSummary.slice(0, -2); 
 
     showLoader();
 
@@ -261,7 +260,7 @@ async function processPosSale() {
     hideLoader();
 }
 
-// --- HISTORIAL DE VENTAS Y ELIMINACIÓN ---
+// --- HISTORIAL DE VENTAS Y ELIMINACIÓN/CANCELACIÓN ---
 async function openHistoryModal() {
     document.getElementById('historyModalOverlay').classList.add('active');
     await fetchSalesHistory();
@@ -294,8 +293,8 @@ async function fetchSalesHistory() {
                     <td style="line-height:1.4;">${row.detalle}</td>
                     <td style="font-weight:bold; color:var(--primary-dark);">$${parseFloat(row.monto).toFixed(2)}</td>
                     <td>
-                        <button class="btn-delete-sale" onclick="deleteSale('${row.id}')" title="Eliminar Venta">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn-delete-sale" onclick="deleteSale('${row.id}')" title="Cancelar Venta">
+                            <i class="fas fa-ban"></i>
                         </button>
                     </td>
                 </tr>
@@ -307,12 +306,12 @@ async function fetchSalesHistory() {
 }
 
 async function deleteSale(financeId) {
-    if(!confirm("¿Estás seguro de eliminar esta venta? Esta acción no se puede deshacer.")) return;
+    if(!confirm("¿Estás seguro de cancelar esta venta? Desaparecerá de tu historial pero quedará registrada como cancelación en el sistema.")) return;
     
     showLoader();
     try {
         const payload = {
-            action: "deleteFinance",
+            action: "cancelFinance", // Ahora usamos la nueva acción
             id: financeId
         };
 
@@ -323,10 +322,10 @@ async function deleteSale(financeId) {
         const result = await res.json();
 
         if (result.status === "success") {
-            showToast('Venta eliminada correctamente', 'success');
-            await fetchSalesHistory(); // Recargar la tabla
+            showToast('Venta cancelada correctamente', 'success');
+            await fetchSalesHistory(); 
         } else {
-            showToast('Error al eliminar la venta', 'error');
+            showToast('Error al cancelar la venta', 'error');
         }
     } catch (err) {
         showToast('Error de conexión con el servidor', 'error');
